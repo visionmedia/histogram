@@ -1,0 +1,25 @@
+{
+  "name": "histogram",
+  "repo": "visionmedia/histogram",
+  "description": "JavaScript histogram component for arbitrary data",
+  "version": "0.0.1",
+  "keywords": [
+    "histo",
+    "histogram",
+    "stats",
+    "statistics",
+    "canvas",
+    "graph"
+  ],
+  "dependencies": {
+    "component/bin": "*",
+    "component/autoscale-canvas": "*",
+    "component/max": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "scripts": [
+    "index.js",
+    "template.js"
+  ]
+}

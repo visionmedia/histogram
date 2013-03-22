@@ -1,0 +1,44 @@
+<html>
+<head>
+  <title>Histogram</title>
+  <style>
+    body {
+      padding: 100px;
+      background: #2f2c2b;
+      font: 100 14px Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: white;
+    }
+    canvas {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Histogram</h1>
+  <script src="build/build.js"></script>
+  <script>
+    var Histogram = require('histogram');
+
+    render(rand(), '#81e7da');
+    render(rand(), '#6abb8a');
+    render(rand(), '#f7e7a0');
+
+    function render(data, color) {
+      var h = new Histogram;
+      h.bins(100);
+      h.size(600, 120);
+      h.add(data, { color: color });
+      var canvas = h.render();
+      document.body.appendChild(canvas);
+    }
+
+    function rand() {
+      var n = 1000;
+      var d = [];
+      while (n--) d.push(Math.random() * (Math.random() * 100 | 0));
+      return d;
+    }
+  </script>
+</body>
+</html>
