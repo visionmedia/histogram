@@ -8,6 +8,12 @@ var autoscale = require('autoscale-canvas')
   , bin = require('bin');
 
 /**
+ * Device pixel ratio.
+ */
+
+var ratio = window.devicePixelRatio || 1;
+
+/**
  * Expose `Histogram`.
  */
 
@@ -24,6 +30,8 @@ function Histogram() {
   this.bins(10);
   this.barColor = '#555555';
   this.barWidth = 3;
+  this.canvas = document.createElement('canvas');
+  this.ctx = this.canvas.getContext('2d');
 }
 
 /**
@@ -57,8 +65,9 @@ Histogram.prototype.add = function(data, options){
  */
 
 Histogram.prototype.size = function(w, h){
-  this.width = w;
-  this.height = h;
+  this.canvas.width = w;
+  this.canvas.height = h;
+  autoscale(this.canvas);
   return this;
 };
 
@@ -71,7 +80,7 @@ Histogram.prototype.size = function(w, h){
  */
 
 Histogram.prototype.bins = function(n){
-  this.maxBins = n;
+  this.maxBins = n * ratio;
   return this;
 };
 
@@ -110,8 +119,9 @@ Histogram.prototype.distribute = function(){
  * @api private
  */
 
-Histogram.prototype.drawBar = function(ctx, color, h){
-  var y = this.height - h;
+Histogram.prototype.drawBar = function(color, h){
+  var ctx = this.ctx;
+  var y = this.canvas.height - h;
   ctx.fillStyle = color;
   ctx.globalAlpha = .5;
   ctx.fillRect(0, y, this.barWidth * .25, h);
@@ -130,33 +140,28 @@ Histogram.prototype.drawBar = function(ctx, color, h){
 
 Histogram.prototype.render = function(){
   var self = this;
-  var w = this.width;
-  var h = this.height;
+  var canvas = this.canvas;
+  var ctx = this.ctx;
+  var w = canvas.width;
+  var h = canvas.height;
   var maxBins = this.maxBins;
   var sets = this.datasets;
   this.distribute();
   var max = this.max();
 
-  // canvas
-  var canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  autoscale(canvas);
-
   // render
-  var ctx = canvas.getContext('2d');
   var sx = w / maxBins | 0;
-
   var n = 0;
   var x = 0;
+
   while (x < w) {
     ctx.save();
     ctx.translate(x, 0);
-    this.drawBar(ctx, this.barColor, h);
+    this.drawBar(this.barColor, h);
     sets.forEach(function(set){
       var val = set.data[n];
       var bh = h * (val / max);
-      self.drawBar(ctx, set.options.color, bh);
+      self.drawBar(set.options.color, bh);
     });
     ctx.restore();
     x += sx;

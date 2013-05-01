@@ -36,7 +36,7 @@
     function rand() {
       var n = 1000;
       var d = [];
-      while (n--) d.push(Math.random() * (Math.random() * 100 | 0));
+      while (n--) d.push(Math.random() + (Math.random() * 100 | 0));
       return d;
     }
   </script>
