@@ -63,6 +63,8 @@ Histogram.prototype.add = function(data, options){
 Histogram.prototype.size = function(w, h){
   this.width = w;
   this.height = h;
+  this.el.style.width = w + 'px';
+  this.el.style.height = h + 'px';
   return this;
 };
 
