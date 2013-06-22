@@ -15,7 +15,7 @@
     "component/bin": "0.2.1",
     "component/min": "1.0.0",
     "component/max": "1.0.0",
-    "matthewmueller/svg": "*"
+    "matthewmueller/svg": "0.0.2"
   },
   "development": {},
   "license": "MIT",
