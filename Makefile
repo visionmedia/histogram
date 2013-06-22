@@ -1,14 +1,11 @@
 
-build: components index.js template.js
+build: components index.js
 	@component build --dev
-
-template.js: template.html
-	@component convert $<
 
 components: component.json
 	@component install --dev
 
 clean:
-	rm -fr build components template.js
+	rm -fr build components
 
 .PHONY: clean

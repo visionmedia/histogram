@@ -3,15 +3,10 @@
  * Module dependencies.
  */
 
-var autoscale = require('autoscale-canvas')
-  , max = require('max')
-  , bin = require('bin');
-
-/**
- * Device pixel ratio.
- */
-
-var ratio = window.devicePixelRatio || 1;
+var svg = require('svg');
+var min = require('min');
+var max = require('max');
+var bin = require('bin');
 
 /**
  * Expose `Histogram`.
@@ -29,9 +24,10 @@ function Histogram() {
   this.datasets = [];
   this.bins(10);
   this.barColor = '#555555';
-  this.barWidth = 3;
-  this.canvas = document.createElement('canvas');
-  this.ctx = this.canvas.getContext('2d');
+  this.barWidth = 1.5;
+  this.el = document.createElement('div');
+  this.el.className = 'histogram';
+  this.svg = svg(this.el);
 }
 
 /**
@@ -65,9 +61,8 @@ Histogram.prototype.add = function(data, options){
  */
 
 Histogram.prototype.size = function(w, h){
-  this.canvas.width = w;
-  this.canvas.height = h;
-  autoscale(this.canvas);
+  this.width = w;
+  this.height = h;
   return this;
 };
 
@@ -80,8 +75,21 @@ Histogram.prototype.size = function(w, h){
  */
 
 Histogram.prototype.bins = function(n){
-  this.maxBins = n * ratio;
+  this.maxBins = n;
   return this;
+};
+
+/**
+ * Return the smallest value in the datasets.
+ *
+ * @return {Number}
+ * @api private
+ */
+
+Histogram.prototype.min = function(){
+  return min(this.datasets, function(set){
+    return min(set.data);
+  });
 };
 
 /**
@@ -103,32 +111,14 @@ Histogram.prototype.max = function(){
  * @api private
  */
 
-Histogram.prototype.distribute = function(){
+Histogram.prototype.distribute = function(min, max){
   for (var i = 0; i < this.datasets.length; i++) {
     var o = this.datasets[i];
-    o.data = bin(o.data, this.maxBins);
+    o.data = bin(o.data, this.maxBins, {
+      min: min,
+      max: max
+    });
   }
-};
-
-/**
- * Draw bar.
- *
- * @param {Context2d} ctx
- * @param {String} color
- * @param {Number} h
- * @api private
- */
-
-Histogram.prototype.drawBar = function(color, h){
-  var ctx = this.ctx;
-  var y = this.canvas.height - h;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = .5;
-  ctx.fillRect(0, y, this.barWidth * .25, h);
-  ctx.globalAlpha = 1;
-  ctx.fillRect(1, y, this.barWidth * .50, h);
-  ctx.globalAlpha = .5;
-  ctx.fillRect(2, y, this.barWidth * .25, h);
 };
 
 /**
@@ -140,33 +130,48 @@ Histogram.prototype.drawBar = function(color, h){
 
 Histogram.prototype.render = function(){
   var self = this;
-  var canvas = this.canvas;
-  var ctx = this.ctx;
-  var w = canvas.width;
-  var h = canvas.height;
+  var svg = this.svg;
+  var w = this.width;
+  var h = this.height;
   var maxBins = this.maxBins;
   var sets = this.datasets;
-  this.distribute();
+
+  // bin
+  var min = this.min();
   var max = this.max();
+  this.distribute(min, max);
 
   // render
-  var sx = w / maxBins | 0;
+  var sx = (w / maxBins | 0) + 1;
   var n = 0;
   var x = 0;
 
   while (x < w) {
-    ctx.save();
-    ctx.translate(x, 0);
-    this.drawBar(this.barColor, h);
+    // ticks
+    svg('rect')
+      .size(this.barWidth, h)
+      .move(x)
+      .attr('class', 'tick')
+      .attr('fill', this.barColor)
+      .attr('opacity', .8)
+
+    // bins
     sets.forEach(function(set){
       var val = set.data[n];
       var bh = h * (val / max);
-      self.drawBar(set.options.color, bh);
+
+      if (!bh) return;
+
+      svg('rect')
+        .size(self.barWidth, bh)
+        .move(x, h - bh)
+        .attr('class', 'bar')
+        .attr('fill', set.options.color);
     });
-    ctx.restore();
+
     x += sx;
     ++n;
   }
 
-  return canvas;
+  return this.el;
 };

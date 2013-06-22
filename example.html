@@ -9,10 +9,13 @@
       -webkit-font-smoothing: antialiased;
       color: white;
     }
-    canvas {
+
+    .histogram {
       margin: 5px 0;
     }
   </style>
+
+  <link rel="stylesheet" type="text/css" href="histogram.css">
 </head>
 <body>
   <h1>Histogram</h1>
@@ -20,23 +23,20 @@
   <script>
     var Histogram = require('histogram');
 
-    render(rand(), '#81e7da');
-    render(rand(), '#6abb8a');
-    render(rand(), '#f7e7a0');
+    var h = new Histogram;
+    h.bins(150);
+    h.size(650, 160);
+    h.add(rand(10, 1), { color: '#6abb8a' });
+    h.add(rand(20, 2), { color: '#f7e7a0' });
+    h.add(rand(5, .5), { color: '#81e7da' });
+    document.body.appendChild(h.render());
 
-    function render(data, color) {
-      var h = new Histogram;
-      h.bins(100);
-      h.size(600, 120);
-      h.add(data, { color: color });
-      var canvas = h.render();
-      document.body.appendChild(canvas);
-    }
-
-    function rand() {
-      var n = 1000;
+    function rand(a, b) {
       var d = [];
-      while (n--) d.push(Math.random() + (Math.random() * 100 | 0));
+      var n = 1000;
+      while (n--) {
+        d.push(a + Math.random() * (15 * b));
+      }
       return d;
     }
   </script>

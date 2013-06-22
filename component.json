@@ -12,14 +12,13 @@
     "graph"
   ],
   "dependencies": {
-    "component/bin": "*",
-    "component/autoscale-canvas": "*",
-    "component/max": "*"
+    "component/bin": "0.2.1",
+    "component/min": "1.0.0",
+    "component/max": "1.0.0",
+    "matthewmueller/svg": "*"
   },
   "development": {},
   "license": "MIT",
-  "scripts": [
-    "index.js",
-    "template.js"
-  ]
+  "scripts": ["index.js"],
+  "styles": ["histogram.css"]
 }
